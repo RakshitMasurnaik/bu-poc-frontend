@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/api"
+export const API_URL = "https://bu-poc-backend.onrender.com/api"
 
 export async function fetcher(endpoint: string, options: RequestInit = {}) {
     let token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
