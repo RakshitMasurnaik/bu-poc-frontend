@@ -172,7 +172,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                                     className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
                                 >
                                     {projects.length === 0 && <option value="">No projects</option>}
-                                    {projects.length > 0 && <option value="" disabled>Select Project</option>}
+                                    {projects.length > 0 && <option value="">-- Select Project --</option>}
                                     {projects.map((p: any) => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
                                     ))}
@@ -271,7 +271,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                         </div>
                     )}
                     
-                    {isOrgAdmin && (
+                    {isOrgAdmin && !selectedProjectId && (
                         <Link href="/members" className={`flex items-center p-2 rounded transition-colors ${pathname === '/members' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
                             <span className="w-6 flex justify-center"><FiUsers size={20} /></span>
                             <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Org Members</span>
