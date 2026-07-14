@@ -148,7 +148,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                 </h1>
                 
                 <div className={`flex flex-col space-y-4 mb-6 ${!isExpanded ? 'hidden' : ''}`}>
-                    {!isPlatformAdmin ? (
+                    {!isPlatformAdmin && (
                         <div className="flex flex-col space-y-2">
                             <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Active Project</span>
                             {isCreating ? (
@@ -182,36 +182,6 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                                 <button onClick={() => setIsCreating(true)} className="text-emerald-400 text-sm text-left hover:underline mt-1">+ New Project</button>
                             )}
                         </div>
-                    ) : (
-                        <div className="flex flex-col space-y-4">
-                            <div className="flex flex-col space-y-2">
-                                <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Organization</span>
-                                <select 
-                                    value={selectedOrgId} 
-                                    onChange={handleOrgSelect}
-                                    className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
-                                >
-                                    <option value="" disabled>Select Organization</option>
-                                    {organizations.map((o: any) => (
-                                        <option key={o.id} value={o.id}>{o.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Active Project</span>
-                                <select 
-                                    value={selectedProjectId} 
-                                    onChange={handleSelect}
-                                    className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
-                                >
-                                    {projects.length === 0 && <option value="">No projects</option>}
-                                    {projects.length > 0 && <option value="" disabled>Select Project</option>}
-                                    {projects.map((p: any) => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
                     )}
                 </div>
 
@@ -240,10 +210,58 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                     {isPlatformAdmin && (
                         <div className={`pt-4 pb-1 transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
                             <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold ml-2 mb-2 block">Organization Management</span>
-                            <Link href="/organizations" className={`flex items-center p-2 rounded transition-colors ${pathname === '/organizations' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
+                            <Link href="/organizations" className={`flex items-center p-2 rounded transition-colors mb-2 ${pathname === '/organizations' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
                                 <span className="w-6 flex justify-center"><FiDatabase size={20} /></span>
-                                <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Organizations</span>
+                                <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>All Organizations</span>
                             </Link>
+                            <div className="space-y-1">
+                                {organizations.map((org: any) => (
+                                    <div key={org.id}>
+                                        <button 
+                                            onClick={() => {
+                                                if (selectedOrgId === org.id) {
+                                                    setSelectedOrgId("");
+                                                    localStorage.removeItem("org_id");
+                                                } else {
+                                                    setSelectedOrgId(org.id);
+                                                    localStorage.setItem("org_id", org.id);
+                                                }
+                                                setSelectedProjectId("");
+                                                localStorage.removeItem("project_id");
+                                                window.dispatchEvent(new Event("storage"));
+                                            }}
+                                            className={`w-full flex items-center justify-between p-2 rounded transition-colors ${selectedOrgId === org.id ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}
+                                        >
+                                            <div className="flex items-center">
+                                                <span className="w-6 flex justify-center"><FiDatabase size={16} /></span>
+                                                <span className={`ml-3 whitespace-nowrap text-sm truncate max-w-[140px]`}>{org.name}</span>
+                                            </div>
+                                            {org.projects && org.projects.length > 0 && (
+                                                <span className="text-neutral-500 text-xs mr-2">{selectedOrgId === org.id ? '▼' : '▶'}</span>
+                                            )}
+                                        </button>
+                                        
+                                        {selectedOrgId === org.id && org.projects && org.projects.length > 0 && (
+                                            <div className="ml-8 mt-1 border-l border-neutral-800 pl-2 space-y-1">
+                                                {org.projects.map((project: any) => (
+                                                    <button
+                                                        key={project.id}
+                                                        onClick={() => {
+                                                            setSelectedProjectId(project.id);
+                                                            localStorage.setItem("project_id", project.id);
+                                                            window.dispatchEvent(new Event("storage"));
+                                                            window.location.href = '/';
+                                                        }}
+                                                        className={`w-full text-left p-2 rounded text-sm transition-colors ${selectedProjectId === project.id ? 'text-emerald-400 bg-neutral-800/50' : 'text-neutral-400 hover:text-white hover:bg-neutral-900'}`}
+                                                    >
+                                                        {project.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                     
