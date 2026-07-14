@@ -1,4 +1,4 @@
-export const API_URL = "https://bu-poc-backend.onrender.com/api"
+export const API_URL = "https://bu-poc-backend.vercel.app/api"
 
 export async function fetcher(endpoint: string, options: RequestInit = {}) {
     let token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
