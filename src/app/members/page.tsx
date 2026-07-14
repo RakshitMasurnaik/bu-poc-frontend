@@ -19,6 +19,7 @@ export default function MembersPage() {
     const [inviting, setInviting] = useState(false)
     const [inviteStatus, setInviteStatus] = useState<string | null>(null)
     const [currentUser, setCurrentUser] = useState<any>(null)
+    const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
 
     useEffect(() => {
         loadData()
@@ -42,6 +43,7 @@ export default function MembersPage() {
             setMembers(data)
 
             const projectId = localStorage.getItem("project_id")
+            setActiveProjectId(projectId)
             if (projectId) {
                 try {
                     const projData = await fetcher(`/projects/${projectId}/members`)
@@ -122,10 +124,11 @@ export default function MembersPage() {
         setInviteStatus(null)
 
         try {
+            const orgId = localStorage.getItem("org_id")
             await fetcher("/auth/invite", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: inviteEmail })
+                body: JSON.stringify({ email: inviteEmail, org_id: orgId })
             })
             setInviteStatus("success")
             setInviteEmail("")
@@ -176,8 +179,12 @@ export default function MembersPage() {
                                                         {getDisplayRole(m) === 'user' && (
                                                             <option value="user" disabled className="hidden">User</option>
                                                         )}
-                                                        <option value="project_member">Project Member</option>
-                                                        <option value="project_admin">Project Admin</option>
+                                                        {activeProjectId && (
+                                                            <>
+                                                                <option value="project_member">Project Member</option>
+                                                                <option value="project_admin">Project Admin</option>
+                                                            </>
+                                                        )}
                                                         <option value="org_admin">Org Admin</option>
                                                     </select>
                                                 ) : (
