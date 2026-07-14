@@ -37,8 +37,15 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ proje
                 // Fetch org users
                 const orgId = localStorage.getItem("org_id") || currentProject.organization_id
                 if (orgId) {
-                    const orgUsersData = await fetcher(`/organizations/${orgId}/users`)
-                    setOrgUsers(orgUsersData)
+                    if (me.global_role === 'platform_admin') {
+                        const orgUsersData = await fetcher(`/organizations/${orgId}/users`)
+                        setOrgUsers(orgUsersData)
+                    } else if (me.global_role === 'orgadmin') {
+                        const orgUsersData = await fetcher(`/organizations/members`)
+                        setOrgUsers(orgUsersData)
+                    } else {
+                        setOrgUsers([])
+                    }
                 }
             }
         } catch (error) {
