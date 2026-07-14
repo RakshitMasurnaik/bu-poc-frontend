@@ -101,13 +101,9 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
         const projData = selectedOrg ? selectedOrg.projects : []
         setProjects(projData)
         
-        if (projData.length > 0) {
-            setSelectedProjectId(projData[0].id)
-            localStorage.setItem("project_id", projData[0].id)
-        } else {
-            setSelectedProjectId("")
-            localStorage.removeItem("project_id")
-        }
+        setSelectedProjectId("")
+        localStorage.removeItem("project_id")
+        
         window.dispatchEvent(new Event("storage"))
         window.location.reload()
     }
@@ -152,7 +148,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                 </h1>
                 
                 <div className={`flex flex-col space-y-4 mb-6 ${!isExpanded ? 'hidden' : ''}`}>
-                    {!isPlatformAdmin && (
+                    {!isPlatformAdmin ? (
                         <div className="flex flex-col space-y-2">
                             <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Active Project</span>
                             {isCreating ? (
@@ -176,6 +172,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                                     className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
                                 >
                                     {projects.length === 0 && <option value="">No projects</option>}
+                                    {projects.length > 0 && <option value="" disabled>Select Project</option>}
                                     {projects.map((p: any) => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
                                     ))}
@@ -185,31 +182,59 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                                 <button onClick={() => setIsCreating(true)} className="text-emerald-400 text-sm text-left hover:underline mt-1">+ New Project</button>
                             )}
                         </div>
+                    ) : (
+                        <div className="flex flex-col space-y-4">
+                            <div className="flex flex-col space-y-2">
+                                <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Organization</span>
+                                <select 
+                                    value={selectedOrgId} 
+                                    onChange={handleOrgSelect}
+                                    className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
+                                >
+                                    <option value="" disabled>Select Organization</option>
+                                    {organizations.map((o: any) => (
+                                        <option key={o.id} value={o.id}>{o.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex flex-col space-y-2">
+                                <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold">Active Project</span>
+                                <select 
+                                    value={selectedProjectId} 
+                                    onChange={handleSelect}
+                                    className="bg-neutral-900 border border-neutral-700 text-white text-sm rounded focus:ring-emerald-500 focus:border-emerald-500 block p-2 w-full"
+                                >
+                                    {projects.length === 0 && <option value="">No projects</option>}
+                                    {projects.length > 0 && <option value="" disabled>Select Project</option>}
+                                    {projects.map((p: any) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     )}
                 </div>
 
                 <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
-                    {!isPlatformAdmin && (
-                        selectedProjectId ? (
-                            <>
-                                <Link href="/" className={`flex items-center p-2 rounded transition-colors ${pathname === '/' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
-                                    <span className="w-6 flex justify-center"><FiPieChart size={20} /></span>
-                                    <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Dashboard</span>
-                                </Link>
-                                <Link href="/connections" className={`flex items-center p-2 rounded transition-colors ${pathname === '/connections' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
-                                    <span className="w-6 flex justify-center"><FiDatabase size={20} /></span>
-                                    <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Connections</span>
-                                </Link>
-                                <Link href="/schemas" className={`flex items-center p-2 rounded transition-colors ${pathname === '/schemas' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
-                                    <span className="w-6 flex justify-center"><FiFileText size={20} /></span>
-                                    <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Schemas</span>
-                                </Link>
-                            </>
-                        ) : (
-                            <div className={`p-3 text-sm text-neutral-500 bg-neutral-900/50 rounded border border-neutral-800 border-dashed ${!isExpanded ? 'hidden' : ''}`}>
-                                Create or select a project to view resources.
-                            </div>
-                        )
+                    {selectedProjectId ? (
+                        <>
+                            <Link href="/" className={`flex items-center p-2 rounded transition-colors ${pathname === '/' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
+                                <span className="w-6 flex justify-center"><FiPieChart size={20} /></span>
+                                <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Dashboard</span>
+                            </Link>
+                            <Link href="/connections" className={`flex items-center p-2 rounded transition-colors ${pathname === '/connections' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
+                                <span className="w-6 flex justify-center"><FiDatabase size={20} /></span>
+                                <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Connections</span>
+                            </Link>
+                            <Link href="/schemas" className={`flex items-center p-2 rounded transition-colors ${pathname === '/schemas' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
+                                <span className="w-6 flex justify-center"><FiFileText size={20} /></span>
+                                <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Schemas</span>
+                            </Link>
+                        </>
+                    ) : (
+                        <div className={`p-3 text-sm text-neutral-500 bg-neutral-900/50 rounded border border-neutral-800 border-dashed ${!isExpanded ? 'hidden' : ''}`}>
+                            {isPlatformAdmin ? "Select an organization and project to view resources." : "Create or select a project to view resources."}
+                        </div>
                     )}
 
                     {isPlatformAdmin && (
