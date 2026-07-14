@@ -62,7 +62,12 @@ export default function OrganizationsPage() {
                         {organizations.map(org => (
                             <button
                                 key={org.id}
-                                onClick={() => setSelectedOrgId(org.id)}
+                                onClick={() => {
+                                    setSelectedOrgId(org.id)
+                                    localStorage.setItem("org_id", org.id)
+                                    localStorage.removeItem("project_id")
+                                    window.dispatchEvent(new Event("storage"))
+                                }}
                                 className={`w-full text-left p-3 rounded-md flex items-center justify-between transition-colors ${selectedOrgId === org.id ? 'bg-emerald-900/30 border border-emerald-800 text-emerald-400' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'}`}
                             >
                                 <div className="flex items-center space-x-3 overflow-hidden">

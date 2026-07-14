@@ -24,6 +24,10 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
     useEffect(() => {
         if (pathname === '/login' || pathname === '/register' || pathname === '/activate') return;
         loadUserAndProjects()
+
+        const handleStorage = () => loadUserAndProjects()
+        window.addEventListener("storage", handleStorage)
+        return () => window.removeEventListener("storage", handleStorage)
     }, [pathname])
 
     useEffect(() => {
@@ -75,11 +79,10 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
             const stored = localStorage.getItem("project_id")
             if (stored && projData.find((p: any) => p.id === stored)) {
                 setSelectedProjectId(stored)
-            } else if (projData.length > 0) {
+            } else if (projData.length > 0 && userData.global_role !== 'platform_admin') {
                 const firstId = projData[0].id
                 setSelectedProjectId(firstId)
                 localStorage.setItem("project_id", firstId)
-                window.dispatchEvent(new Event("storage"))
             } else {
                 localStorage.removeItem("project_id")
                 setSelectedProjectId("")
