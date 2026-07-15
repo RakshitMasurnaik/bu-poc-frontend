@@ -23,6 +23,10 @@ export default function MembersPage() {
 
     useEffect(() => {
         loadData()
+        
+        const handleStorage = () => loadMembers()
+        window.addEventListener("storage", handleStorage)
+        return () => window.removeEventListener("storage", handleStorage)
     }, [])
 
     const loadData = async () => {

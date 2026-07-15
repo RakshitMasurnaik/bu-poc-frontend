@@ -12,6 +12,10 @@ export default function OrganizationsPage() {
 
     useEffect(() => {
         loadOrganizations()
+        
+        const handleStorage = () => loadOrganizations()
+        window.addEventListener("storage", handleStorage)
+        return () => window.removeEventListener("storage", handleStorage)
     }, [])
 
     const loadOrganizations = async () => {
