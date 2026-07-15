@@ -220,18 +220,18 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                         </div>
                     )}
                     
-                    {(isOrgAdmin || isProjectAdmin) && (
+                    {((isOrgAdmin && !isPlatformAdmin && !selectedProjectId) || (isProjectAdmin && selectedProjectId)) && (
                         <div className={`pt-4 pb-1 transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
                             <span className="text-xs text-neutral-400 uppercase tracking-wider font-semibold ml-2">Administration</span>
                         </div>
                     )}
                     
-                    {/* Organization Member Invite tab */}
-                    {isOrgAdmin && !selectedProjectId && (!isPlatformAdmin || selectedOrgId) && (
+                    {/* Organization Member Invite tab (Only for non-platform org admins) */}
+                    {isOrgAdmin && !isPlatformAdmin && !selectedProjectId && (
                         <Link href="/members" className={`flex items-center p-2 rounded transition-colors ${pathname === '/members' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
                             <span className="w-6 flex justify-center"><FiUsers size={20} /></span>
                             <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
-                                {isPlatformAdmin ? "Organization Member Invite" : "Org Members"}
+                                Org Members
                             </span>
                         </Link>
                     )}
