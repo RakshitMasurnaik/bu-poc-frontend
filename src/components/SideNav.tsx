@@ -202,9 +202,11 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                             </Link>
                         </>
                     ) : (
-                        <div className={`p-3 text-sm text-neutral-500 bg-neutral-900/50 rounded border border-neutral-800 border-dashed ${!isExpanded ? 'hidden' : ''}`}>
-                            {isPlatformAdmin ? "Select an organization and project to view resources." : "Create or select a project to view resources."}
-                        </div>
+                        !isPlatformAdmin && (
+                            <div className={`p-3 text-sm text-neutral-500 bg-neutral-900/50 rounded border border-neutral-800 border-dashed ${!isExpanded ? 'hidden' : ''}`}>
+                                Create or select a project to view resources.
+                            </div>
+                        )
                     )}
 
                     {isPlatformAdmin && (
@@ -271,17 +273,23 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                         </div>
                     )}
                     
-                    {isOrgAdmin && !selectedProjectId && (
+                    {/* Organization Member Invite tab */}
+                    {isOrgAdmin && !selectedProjectId && (!isPlatformAdmin || selectedOrgId) && (
                         <Link href="/members" className={`flex items-center p-2 rounded transition-colors ${pathname === '/members' ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
                             <span className="w-6 flex justify-center"><FiUsers size={20} /></span>
-                            <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Org Members</span>
+                            <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                                {isPlatformAdmin ? "Organization Member Invite" : "Org Members"}
+                            </span>
                         </Link>
                     )}
 
+                    {/* Project Add Member tab */}
                     {isProjectAdmin && selectedProjectId && (
                         <Link href={`/projects/${selectedProjectId}`} className={`flex items-center p-2 rounded transition-colors ${pathname.startsWith('/projects/') ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}>
                             <span className="w-6 flex justify-center"><FiShield size={20} /></span>
-                            <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>Project Members</span>
+                            <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                                {isPlatformAdmin ? "Project Add Member" : "Project Members"}
+                            </span>
                         </Link>
                     )}
                 </nav>
