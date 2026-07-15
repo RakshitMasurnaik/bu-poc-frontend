@@ -18,11 +18,14 @@ export default function OrganizationsPage() {
         try {
             const data = await fetcher("/organizations/")
             setOrganizations(data)
-            const savedOrgId = sessionStorage.getItem("platformSelectedOrgId")
+            const savedOrgId = localStorage.getItem("org_id")
             if (savedOrgId && data.find((o: any) => o.id === savedOrgId)) {
                 setSelectedOrgId(savedOrgId)
             } else if (data.length > 0) {
                 setSelectedOrgId(data[0].id)
+                localStorage.setItem("org_id", data[0].id)
+                localStorage.removeItem("project_id")
+                window.dispatchEvent(new Event("storage"))
             }
         } catch (error) {
             console.error("Failed to load organizations", error)
@@ -31,7 +34,6 @@ export default function OrganizationsPage() {
 
     useEffect(() => {
         if (!selectedOrgId) return
-        sessionStorage.setItem("platformSelectedOrgId", selectedOrgId)
         fetcher(`/organizations/${selectedOrgId}/users`)
             .then(setOrgUsers)
             .catch(e => console.error("Failed to load org users", e))
