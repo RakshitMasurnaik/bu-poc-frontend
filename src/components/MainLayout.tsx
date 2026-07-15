@@ -38,7 +38,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarExpanded ? 'ml-64' : 'ml-20'}`}>
                 <Header toggleSidebar={() => setIsSidebarExpanded(!isSidebarExpanded)} isSidebarExpanded={isSidebarExpanded} />
                 <main className="flex-1 p-6">
-                    {hasProject ? (
+                    {hasProject || pathname === '/organizations' || pathname === '/members' ? (
                         children
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full text-neutral-500 space-y-4 pt-20">
