@@ -216,54 +216,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
                                 <span className="w-6 flex justify-center"><FiDatabase size={20} /></span>
                                 <span className={`ml-3 whitespace-nowrap transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>All Organizations</span>
                             </Link>
-                            <div className="space-y-1">
-                                {organizations.map((org: any) => (
-                                    <div key={org.id}>
-                                        <button 
-                                            onClick={() => {
-                                                if (selectedOrgId === org.id) {
-                                                    setSelectedOrgId("");
-                                                    localStorage.removeItem("org_id");
-                                                } else {
-                                                    setSelectedOrgId(org.id);
-                                                    localStorage.setItem("org_id", org.id);
-                                                }
-                                                setSelectedProjectId("");
-                                                localStorage.removeItem("project_id");
-                                                window.dispatchEvent(new Event("storage"));
-                                            }}
-                                            className={`w-full flex items-center justify-between p-2 rounded transition-colors ${selectedOrgId === org.id ? 'bg-neutral-800 text-emerald-400' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'}`}
-                                        >
-                                            <div className="flex items-center">
-                                                <span className="w-6 flex justify-center"><FiDatabase size={16} /></span>
-                                                <span className={`ml-3 whitespace-nowrap text-sm truncate max-w-[140px]`}>{org.name}</span>
-                                            </div>
-                                            {org.projects && org.projects.length > 0 && (
-                                                <span className="text-neutral-500 text-xs mr-2">{selectedOrgId === org.id ? '▼' : '▶'}</span>
-                                            )}
-                                        </button>
-                                        
-                                        {selectedOrgId === org.id && org.projects && org.projects.length > 0 && (
-                                            <div className="ml-8 mt-1 border-l border-neutral-800 pl-2 space-y-1">
-                                                {org.projects.map((project: any) => (
-                                                    <button
-                                                        key={project.id}
-                                                        onClick={() => {
-                                                            setSelectedProjectId(project.id);
-                                                            localStorage.setItem("project_id", project.id);
-                                                            window.dispatchEvent(new Event("storage"));
-                                                            window.location.href = '/';
-                                                        }}
-                                                        className={`w-full text-left p-2 rounded text-sm transition-colors ${selectedProjectId === project.id ? 'text-emerald-400 bg-neutral-800/50' : 'text-neutral-400 hover:text-white hover:bg-neutral-900'}`}
-                                                    >
-                                                        {project.name}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+
                         </div>
                     )}
                     
