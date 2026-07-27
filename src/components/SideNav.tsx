@@ -56,30 +56,26 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
             const userData = await fetcher('/auth/me')
             setUser(userData)
             
-            let projData: any[] = []
+            // Fetch organizations for everyone (backend now filters by membership)
+            const orgs = await fetcher('/organizations/')
+            setOrganizations(orgs)
             
-            if (userData.global_role === 'platform_admin') {
-                const orgs = await fetcher('/organizations/')
-                setOrganizations(orgs)
-                
-                const storedOrg = localStorage.getItem("org_id")
-                let initialOrg = orgs.find((o: any) => o.id === storedOrg) ? storedOrg : (orgs.length > 0 ? orgs[0].id : "")
-                setSelectedOrgId(initialOrg)
-                if (initialOrg) {
-                    localStorage.setItem("org_id", initialOrg)
-                    const selectedOrg = orgs.find((o: any) => o.id === initialOrg)
-                    projData = selectedOrg ? selectedOrg.projects : []
-                }
-            } else {
-                projData = await fetcher('/projects/')
+            const storedOrg = localStorage.getItem("org_id")
+            let initialOrg = orgs.find((o: any) => o.id === storedOrg) ? storedOrg : (orgs.length > 0 ? orgs[0].id : "")
+            setSelectedOrgId(initialOrg)
+            if (initialOrg) {
+                localStorage.setItem("org_id", initialOrg)
             }
+            
+            const selectedOrg = orgs.find((o: any) => o.id === initialOrg)
+            const projData = selectedOrg ? selectedOrg.projects : []
             
             setProjects(projData)
             
             const stored = localStorage.getItem("project_id")
             if (stored && projData.find((p: any) => p.id === stored)) {
                 setSelectedProjectId(stored)
-            } else if (projData.length > 0 && userData.global_role !== 'platform_admin') {
+            } else if (projData.length > 0) {
                 const firstId = projData[0].id
                 setSelectedProjectId(firstId)
                 localStorage.setItem("project_id", firstId)

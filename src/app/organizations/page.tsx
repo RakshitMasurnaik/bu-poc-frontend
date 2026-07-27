@@ -19,14 +19,26 @@ export default function OrganizationsPage() {
     const [inviteEmail, setInviteEmail] = useState("")
     const [inviting, setInviting] = useState(false)
     const [inviteStatus, setInviteStatus] = useState<string | null>(null)
+    const [activeUsers, setActiveUsers] = useState<any[]>([])
+    const [selectedUserId, setSelectedUserId] = useState("")
 
     useEffect(() => {
         loadOrganizations()
+        loadActiveUsers()
         
         const handleStorage = () => loadOrganizations()
         window.addEventListener("storage", handleStorage)
         return () => window.removeEventListener("storage", handleStorage)
     }, [])
+
+    const loadActiveUsers = async () => {
+        try {
+            const data = await fetcher("/organizations/active_users")
+            setActiveUsers(data)
+        } catch (error) {
+            console.error("Failed to load active users", error)
+        }
+    }
 
     const loadOrganizations = async () => {
         try {
@@ -85,16 +97,28 @@ export default function OrganizationsPage() {
         setInviteStatus(null)
 
         try {
-            await fetcher("/auth/invite", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: inviteEmail, org_id: modalOrgId })
-            })
-            setInviteStatus("success")
-            setInviteEmail("")
+            if (selectedUserId) {
+                // Add existing user to org
+                await fetcher(`/organizations/${modalOrgId}/add_member`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: selectedUserId, role: "user" })
+                })
+                setInviteStatus("success_add")
+                setSelectedUserId("")
+            } else if (inviteEmail) {
+                // Invite new user via email
+                await fetcher("/auth/invite", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: inviteEmail, org_id: modalOrgId })
+                })
+                setInviteStatus("success")
+                setInviteEmail("")
+            }
             loadOrgUsers(modalOrgId)
         } catch (error: any) {
-            setInviteStatus(error.message || "Failed to send invite")
+            setInviteStatus(error.message || "Failed to add/invite member")
         } finally {
             setInviting(false)
         }
@@ -274,23 +298,54 @@ export default function OrganizationsPage() {
                                     </div>
 
                                     <form onSubmit={handleInvite} className="space-y-5">
-                                        <div>
-                                            <label className="block text-xs font-medium text-neutral-400 mb-1.5">Email Address</label>
-                                            <input 
-                                                type="email" 
-                                                value={inviteEmail}
-                                                onChange={e => setInviteEmail(e.target.value)}
-                                                placeholder="colleague@company.com" 
-                                                required
-                                                className="w-full bg-neutral-950 border border-neutral-800 text-sm text-neutral-200 rounded-md px-4 py-2.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-                                            />
+                                        <div className="space-y-4">
+                                            {/* Select Existing User */}
+                                            <div>
+                                                <label className="block text-xs font-medium text-neutral-400 mb-1.5">Add Existing Active User</label>
+                                                <select 
+                                                    value={selectedUserId}
+                                                    onChange={e => {
+                                                        setSelectedUserId(e.target.value)
+                                                        setInviteEmail("")
+                                                    }}
+                                                    className="w-full bg-neutral-950 border border-neutral-800 text-sm text-neutral-200 rounded-md px-4 py-2.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-pointer"
+                                                >
+                                                    <option value="">-- Select an active user --</option>
+                                                    {activeUsers.map(u => (
+                                                        <option key={u.id} value={u.id}>
+                                                            {u.full_name || u.email} ({u.email})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="relative flex py-2 items-center">
+                                                <div className="flex-grow border-t border-neutral-800"></div>
+                                                <span className="flex-shrink-0 mx-4 text-neutral-500 text-xs uppercase font-semibold tracking-wider">Or Invite New</span>
+                                                <div className="flex-grow border-t border-neutral-800"></div>
+                                            </div>
+
+                                            {/* Invite New User */}
+                                            <div>
+                                                <label className="block text-xs font-medium text-neutral-400 mb-1.5">Email Address</label>
+                                                <input 
+                                                    type="email" 
+                                                    value={inviteEmail}
+                                                    onChange={e => {
+                                                        setInviteEmail(e.target.value)
+                                                        setSelectedUserId("")
+                                                    }}
+                                                    placeholder="colleague@company.com" 
+                                                    className="w-full bg-neutral-950 border border-neutral-800 text-sm text-neutral-200 rounded-md px-4 py-2.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+                                                />
+                                            </div>
                                         </div>
                                         <button 
                                             type="submit" 
-                                            disabled={inviting || !inviteEmail}
+                                            disabled={inviting || (!inviteEmail && !selectedUserId)}
                                             className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-md transition-colors flex justify-center items-center"
                                         >
-                                            {inviting ? "Sending Invite..." : "Send Invitation"}
+                                            {inviting ? "Processing..." : selectedUserId ? "Add User to Organization" : "Send Invitation"}
                                         </button>
                                         
                                         {inviteStatus === "success" && (
@@ -301,8 +356,17 @@ export default function OrganizationsPage() {
                                                 </span>
                                             </div>
                                         )}
+
+                                        {inviteStatus === "success_add" && (
+                                            <div className="p-4 bg-emerald-950/30 border border-emerald-900/50 rounded-md flex items-start space-x-3">
+                                                <FiCheck className="text-emerald-500 mt-0.5 shrink-0" />
+                                                <span className="text-emerald-400 text-xs leading-relaxed">
+                                                    User added to organization successfully!
+                                                </span>
+                                            </div>
+                                        )}
                                         
-                                        {inviteStatus && inviteStatus !== "success" && (
+                                        {inviteStatus && inviteStatus !== "success" && inviteStatus !== "success_add" && (
                                             <div className="p-4 bg-red-950/30 border border-red-900/50 rounded-md">
                                                 <span className="text-red-400 text-xs leading-relaxed">
                                                     {inviteStatus}
