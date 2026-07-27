@@ -119,7 +119,7 @@ export default function SideNav({ isExpanded }: { isExpanded: boolean }) {
             // For now, let's keep it simple. If backend uses current_user.organization_id, platform admin creation might fail or create under None.
             const data = await fetcher('/projects/', {
                 method: 'POST',
-                body: JSON.stringify({ name: newProjectName })
+                body: JSON.stringify({ name: newProjectName, org_id: selectedOrgId })
             })
             setProjects([...projects, data])
             setSelectedProjectId(data.id)
