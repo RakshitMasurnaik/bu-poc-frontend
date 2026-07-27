@@ -6,7 +6,7 @@ import Header from './Header'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
-    const isAuth = pathname === '/login' || pathname === '/register'
+    const isAuth = pathname === '/login' || pathname === '/register' || pathname === '/activate'
     const [hasProject, setHasProject] = useState<boolean>(true) 
     const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true)
 

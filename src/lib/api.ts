@@ -6,7 +6,7 @@ export async function fetcher(endpoint: string, options: RequestInit = {}) {
     // Redirect to login if no token and not on auth pages
     if (!token && typeof window !== 'undefined') {
         const path = window.location.pathname;
-        if (path !== '/login' && path !== '/register') {
+        if (path !== '/login' && path !== '/register' && path !== '/activate') {
             window.location.href = '/login';
             throw new Error("Not authenticated");
         }
