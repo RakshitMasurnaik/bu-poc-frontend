@@ -4,6 +4,8 @@ import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { FiCheckCircle, FiAlertCircle } from "react-icons/fi"
 
+import { API_URL } from "@/lib/api"
+
 function ActivateForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -43,7 +45,7 @@ function ActivateForm() {
 
         setLoading(true)
         try {
-            const res = await fetch("http://localhost:8000/api/auth/activate", {
+            const res = await fetch(`${API_URL}/auth/activate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
