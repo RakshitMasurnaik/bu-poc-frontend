@@ -8,6 +8,7 @@ function ActivateForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get("token")
+    const emailParam = searchParams.get("email") || ""
 
     const [fullName, setFullName] = useState("")
     const [password, setPassword] = useState("")
@@ -73,7 +74,7 @@ function ActivateForm() {
         return (
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <FiCheckCircle size={48} className="text-emerald-500" />
-                <h2 className="text-2xl font-bold text-white">Account Activated!</h2>
+                <h2 className="text-2xl font-bold text-white">Sign Up Complete!</h2>
                 <p className="text-neutral-400">Your account has been successfully created.</p>
                 <p className="text-sm text-neutral-500">Redirecting to login in a few seconds...</p>
             </div>
@@ -83,9 +84,9 @@ function ActivateForm() {
     return (
         <div className="w-full max-w-md space-y-8">
             <div className="text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-white">Activate Account</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-white">Sign Up</h2>
                 <p className="mt-2 text-sm text-neutral-400">
-                    Welcome to the organization! Please set up your profile.
+                    Welcome! Please complete your profile to join the organization.
                 </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -95,6 +96,15 @@ function ActivateForm() {
                     </div>
                 )}
                 <div className="space-y-4 rounded-md shadow-sm">
+                    <div>
+                        <label className="block text-sm font-medium text-neutral-300">Email Address</label>
+                        <input
+                            type="email"
+                            disabled
+                            className="mt-1 block w-full rounded-md border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 cursor-not-allowed sm:text-sm"
+                            value={emailParam}
+                        />
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-neutral-300">Full Name</label>
                         <input
@@ -136,7 +146,7 @@ function ActivateForm() {
                         disabled={loading}
                         className="group relative flex w-full justify-center rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:bg-emerald-800 disabled:cursor-not-allowed"
                     >
-                        {loading ? "Activating..." : "Activate Account"}
+                        {loading ? "Signing up..." : "Complete Sign Up"}
                     </button>
                 </div>
             </form>
